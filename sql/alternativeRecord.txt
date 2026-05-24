@@ -1,0 +1,189 @@
+PROBLEM: Display Alternate Records from a Table
+
+Table:
+employees(id, name, salary, department_id)
+
+---
+
+APPROACH 1: USING WINDOW FUNCTION (RECOMMENDED)
+
+Query:
+SELECT id, name, salary, department_id
+FROM (
+SELECT *,
+ROW_NUMBER() OVER (ORDER BY id) AS rn
+FROM employees
+) t
+WHERE rn % 2 = 1;
+
+---
+
+EXPLANATION:
+
+1. ROW_NUMBER() OVER (ORDER BY id)
+
+   * Assigns sequential numbers to each row
+   * Example:
+     id: 1 → rn = 1
+     id: 2 → rn = 2
+     id: 3 → rn = 3
+     ...
+
+2. ORDER BY id
+
+   * Defines the order of rows
+   * VERY IMPORTANT: Without ORDER BY, result is undefined
+
+3. rn % 2 = 1
+
+   * Selects odd row numbers → 1st, 3rd, 5th rows
+   * To get even rows → use rn % 2 = 0
+
+---
+
+OUTPUT EXAMPLE:
+
+Input:
+id | name
+1  | A
+2  | B
+3  | C
+4  | D
+5  | E
+
+Output (rn % 2 = 1):
+1  | A
+3  | C
+5  | E
+
+---
+
+---
+
+APPROACH 2: USING MOD FUNCTION
+
+Query:
+SELECT id, name, salary, department_id
+FROM (
+SELECT *,
+ROW_NUMBER() OVER (ORDER BY id) AS rn
+FROM employees
+) t
+WHERE MOD(rn, 2) = 1;
+
+---
+
+EXPLANATION:
+
+* MOD(rn, 2) returns remainder
+* Same as rn % 2
+* MOD(rn, 2) = 1 → odd rows
+
+---
+
+---
+
+APPROACH 3: WITHOUT WINDOW FUNCTION (NOT RECOMMENDED)
+
+Query:
+SELECT *
+FROM employees e1
+WHERE (
+SELECT COUNT(*)
+FROM employees e2
+WHERE e2.id <= e1.id
+) % 2 = 1;
+
+---
+
+EXPLANATION:
+
+1. For each row:
+
+   * Counts how many rows come before it (including itself)
+
+2. Example:
+   id = 3 → count = 3
+
+3. Apply modulo:
+
+   * 3 % 2 = 1 → include row
+
+---
+
+LIMITATIONS:
+
+* Time complexity is high (O(n²))
+* Not suitable for large datasets
+* Avoid in production systems
+
+---
+
+---
+
+BONUS: ALTERNATE ROWS PER DEPARTMENT
+
+Query:
+SELECT id, name, salary, department_id
+FROM (
+SELECT *,
+ROW_NUMBER() OVER (
+PARTITION BY department_id
+ORDER BY id
+) AS rn
+FROM employees
+) t
+WHERE rn % 2 = 1;
+
+---
+
+EXPLANATION:
+
+1. PARTITION BY department_id
+
+   * Splits data into groups per department
+
+2. ROW_NUMBER resets for each department
+
+3. rn % 2 = 1
+
+   * Picks alternate rows within each department
+
+---
+
+---
+
+EDGE CASES:
+
+1. No ORDER BY:
+
+   * Output becomes unpredictable
+
+2. Duplicate IDs:
+
+   * Use another column (created_at) for ordering
+
+3. Gaps in ID:
+
+   * Does not affect result (ROW_NUMBER handles sequence)
+
+---
+
+---
+
+PERFORMANCE TIP:
+
+* Create index on ordering column:
+  CREATE INDEX idx_emp_id ON employees(id);
+
+* Improves sorting performance
+
+---
+
+---
+
+FINAL INTERVIEW ANSWER:
+
+"Use ROW_NUMBER() with a window function and filter rows using modulo (rn % 2) to fetch alternate records. Always define ORDER BY to ensure deterministic results."
+
+---

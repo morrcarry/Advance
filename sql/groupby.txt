@@ -1,0 +1,289 @@
+SQL AGGREGATE FUNCTIONS + GROUP BY + ORDER BY (UPDATED INTERVIEW DOC)
+
+---
+
+## SAMPLE TABLE: employees
+
+## id | name | department | salary
+
+1  | A    | IT         | 100
+2  | B    | IT         | 200
+3  | C    | HR         | 150
+4  | D    | HR         | 150
+5  | E    | Sales      | 300
+6  | F    | Sales      | 250
+
+---
+
+1. COUNT() — COUNT EMPLOYEES PER DEPARTMENT
+
+---
+
+Query:
+SELECT department, COUNT(*) AS total_employees
+FROM employees
+GROUP BY department
+ORDER BY total_employees DESC;
+
+Output:
+department | total_employees
+----------------------------
+
+IT         | 2
+HR         | 2
+Sales      | 2
+
+Notes:
+
+* ORDER BY DESC → highest first
+* Useful when counts differ
+
+---
+
+2. SUM() — TOTAL SALARY PER DEPARTMENT
+
+---
+
+Query:
+SELECT department, SUM(salary) AS total_salary
+FROM employees
+GROUP BY department
+ORDER BY total_salary DESC;
+
+Output:
+department | total_salary
+-------------------------
+
+Sales      | 550
+IT         | 300
+HR         | 300
+
+Notes:
+
+* Very common interview question
+* Sorting by aggregate is important
+
+---
+
+3. AVG() — AVERAGE SALARY
+
+---
+
+Query:
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+ORDER BY avg_salary DESC;
+
+Output:
+department | avg_salary
+-----------------------
+
+Sales      | 275
+IT         | 150
+HR         | 150
+
+Notes:
+
+* ORDER BY AVG is frequently asked
+
+---
+
+4. MIN() — LOWEST SALARY
+
+---
+
+Query:
+SELECT department, MIN(salary) AS min_salary
+FROM employees
+GROUP BY department
+ORDER BY min_salary ASC;
+
+Output:
+department | min_salary
+-----------------------
+
+IT         | 100
+HR         | 150
+Sales      | 250
+
+Notes:
+
+* ASC → smallest first
+
+---
+
+5. MAX() — HIGHEST SALARY
+
+---
+
+Query:
+SELECT department, MAX(salary) AS max_salary
+FROM employees
+GROUP BY department
+ORDER BY max_salary DESC;
+
+Output:
+department | max_salary
+-----------------------
+
+Sales      | 300
+IT         | 200
+HR         | 150
+
+Notes:
+
+* DESC → highest first
+
+---
+
+6. ALL AGGREGATES TOGETHER
+
+---
+
+Query:
+SELECT
+department,
+COUNT(*) AS total_employees,
+SUM(salary) AS total_salary,
+AVG(salary) AS avg_salary,
+MIN(salary) AS min_salary,
+MAX(salary) AS max_salary
+FROM employees
+GROUP BY department
+ORDER BY total_salary DESC;
+
+Output:
+department | total | sum | avg | min | max
+------------------------------------------
+
+Sales      | 2     | 550 | 275 | 250 | 300
+IT         | 2     | 300 | 150 | 100 | 200
+HR         | 2     | 300 | 150 | 150 | 150
+
+Notes:
+
+* You can sort by ANY aggregate column
+
+---
+
+7. HAVING + ORDER BY
+
+---
+
+Query:
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 200
+ORDER BY avg_salary DESC;
+
+Output:
+department | avg_salary
+-----------------------
+
+Sales      | 275
+
+Notes:
+
+* HAVING filters first, then ORDER BY sorts
+
+---
+
+## INTERVIEW QUESTIONS + ORDER BY
+
+1. Department with highest total salary
+
+Query:
+SELECT department, SUM(salary) AS total_salary
+FROM employees
+GROUP BY department
+ORDER BY total_salary DESC
+LIMIT 1;
+
+Output:
+Sales | 550
+
+---
+
+2. Department with lowest average salary
+
+Query:
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+ORDER BY avg_salary ASC
+LIMIT 1;
+
+Output:
+IT | 150
+(or HR depending on tie)
+
+---
+
+3. Sort departments by salary difference
+
+Query:
+SELECT department,
+MAX(salary) - MIN(salary) AS diff
+FROM employees
+GROUP BY department
+ORDER BY diff DESC;
+
+Output:
+IT     | 100
+Sales  | 50
+HR     | 0
+
+---
+
+4. Top 2 departments by employee count
+
+Query:
+SELECT department, COUNT(*) AS total
+FROM employees
+GROUP BY department
+ORDER BY total DESC
+LIMIT 2;
+
+Output:
+IT | 2
+HR | 2
+
+---
+
+IMPORTANT NOTES (VERY IMPORTANT)
+
+1. ORDER BY always comes AFTER GROUP BY
+
+Execution order:
+FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT
+
+---
+
+2. You can ORDER BY:
+
+* column name
+* alias (recommended)
+* aggregate function
+
+---
+
+3. Common mistake:
+
+❌ ORDER BY salary
+✔ ORDER BY SUM(salary)
+
+---
+
+4. Multiple sorting:
+
+ORDER BY total_salary DESC, department ASC;
+
+---
+
+FINAL INTERVIEW ANSWER:
+
+"ORDER BY is used after GROUP BY to sort aggregated results, typically using aggregate aliases like SUM or AVG. It helps in ranking and identifying top or bottom groups."
+
+---

@@ -1,0 +1,317 @@
+PROBLEM: Find the Second Highest Salary
+
+Table:
+employees(id, name, salary)
+
+---
+
+APPROACH 1: WINDOW FUNCTION (BEST)
+
+Query:
+SELECT salary
+FROM (
+SELECT salary,
+DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+FROM employees
+) t
+WHERE rnk = 2;
+
+Explanation:
+
+* ORDER BY salary DESC → highest first
+* DENSE_RANK assigns ranking without gaps
+* rnk = 2 gives second highest salary
+* Handles duplicates properly
+* Scalable for Nth highest
+
+---
+
+APPROACH 2: LIMIT + OFFSET
+
+Query:
+SELECT DISTINCT salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 1 OFFSET 1;
+
+Explanation:
+
+* DISTINCT removes duplicates
+* ORDER BY DESC sorts highest first
+* OFFSET 1 skips highest
+* LIMIT 1 picks next → second highest
+
+---
+
+APPROACH 3: USING MAX()
+
+Query:
+SELECT MAX(salary) AS second_highest
+FROM employees
+WHERE salary < (
+SELECT MAX(salary)
+FROM employees
+);
+
+Explanation:
+
+* Inner query finds highest salary
+* Outer query finds max salary less than highest
+* Simple but not scalable for Nth highest
+
+---
+
+APPROACH 4: MYSQL STYLE LIMIT
+
+Query:
+SELECT salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 1, 1;
+
+Explanation:
+
+* LIMIT 1,1 → skip 1 row, take 1 row
+* Shortcut for OFFSET
+
+---
+
+APPROACH 5: CORRELATED SUBQUERY
+
+Query:
+SELECT DISTINCT e1.salary
+FROM employees e1
+WHERE 1 = (
+SELECT COUNT(DISTINCT e2.salary)
+FROM employees e2
+WHERE e2.salary > e1.salary
+);
+
+Explanation:
+
+* Counts how many salaries are greater
+* Second highest → exactly 1 greater salary
+* Advanced but heavy query
+
+---
+
+EDGE CASES:
+
+1. Duplicate salaries:
+   100, 90, 90, 80
+   Answer = 90
+
+2. All same:
+   100, 100, 100
+   Answer = NULL
+
+3. Single row:
+   Answer = NULL
+
+---
+
+INTERVIEW TIP:
+
+Best answer:
+"Use DENSE_RANK() with a window function because it handles duplicates and scales for Nth highest problems."
+
+---
+PROBLEM: Find the Highest Salary Per Department
+
+Table:
+employees(id, name, salary, department_id)
+
+---
+
+APPROACH 1: WINDOW FUNCTION (RECOMMENDED)
+
+Query:
+SELECT id, name, salary, department_id
+FROM (
+SELECT *,
+ROW_NUMBER() OVER (
+PARTITION BY department_id
+ORDER BY salary DESC
+) AS rn
+FROM employees
+) t
+WHERE rn = 1;
+
+---
+
+EXPLANATION:
+
+1. PARTITION BY department_id
+
+   * Splits the table into groups (one per department)
+   * Each department is processed independently
+
+2. ORDER BY salary DESC
+
+   * Sorts employees within each department
+   * Highest salary comes first
+
+3. ROW_NUMBER()
+
+   * Assigns:
+     1 → highest salary
+     2 → second highest
+     3 → third highest
+
+4. WHERE rn = 1
+
+   * Picks only the top employee per department
+
+---
+
+IMPORTANT NOTE:
+
+If multiple employees have SAME highest salary:
+
+* ROW_NUMBER() → returns ONLY ONE row
+* If you want ALL employees with highest salary → use DENSE_RANK()
+
+---
+
+---
+
+APPROACH 2: USING DENSE_RANK() (HANDLES TIES)
+
+Query:
+SELECT id, name, salary, department_id
+FROM (
+SELECT *,
+DENSE_RANK() OVER (
+PARTITION BY department_id
+ORDER BY salary DESC
+) AS rnk
+FROM employees
+) t
+WHERE rnk = 1;
+
+---
+
+EXPLANATION:
+
+* DENSE_RANK() gives same rank to same salary
+* If 2 employees share highest salary → both get rank = 1
+* This query returns ALL top earners per department
+
+---
+
+---
+
+APPROACH 3: GROUP BY + JOIN (CLASSIC)
+
+Query:
+SELECT e.*
+FROM employees e
+JOIN (
+SELECT department_id, MAX(salary) AS max_salary
+FROM employees
+GROUP BY department_id
+) t
+ON e.department_id = t.department_id
+AND e.salary = t.max_salary;
+
+---
+
+EXPLANATION:
+
+1. Subquery:
+
+   * Finds highest salary per department
+
+2. JOIN:
+
+   * Matches employees with that salary
+
+3. Result:
+
+   * Returns all employees who have max salary
+
+---
+
+---
+
+APPROACH 4: CORRELATED SUBQUERY (ADVANCED)
+
+Query:
+SELECT *
+FROM employees e1
+WHERE salary = (
+SELECT MAX(salary)
+FROM employees e2
+WHERE e2.department_id = e1.department_id
+);
+
+---
+
+EXPLANATION:
+
+* For each employee:
+  → find max salary in their department
+* If matches → include in result
+
+---
+
+---
+
+INTERVIEW COMPARISON:
+
+ROW_NUMBER():
+
+* Returns 1 row per department
+* Faster when only 1 needed
+
+DENSE_RANK():
+
+* Returns all ties
+* Preferred when duplicates matter
+
+GROUP BY + JOIN:
+
+* Most widely supported
+* Easy to explain
+
+CORRELATED:
+
+* Clean logic
+* But slower for large datasets
+
+---
+
+EDGE CASES:
+
+1. Multiple top salaries:
+
+   * Use DENSE_RANK() or JOIN approach
+
+2. NULL salaries:
+
+   * Usually ignored in MAX()
+   * Handle explicitly if needed
+
+3. Empty department:
+
+   * No result returned
+
+---
+
+PERFORMANCE TIP:
+
+* Add index:
+  CREATE INDEX idx_dept_salary ON employees(department_id, salary DESC);
+
+* Helps in:
+
+  * Sorting inside partition
+  * Faster grouping
+
+---
+
+FINAL INTERVIEW ANSWER:
+
+"The best approach is using a window function with DENSE_RANK() when we want all top earners, or ROW_NUMBER() when we only need one record per department."
+
+---

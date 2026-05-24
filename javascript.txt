@@ -1,0 +1,131 @@
+========================================================
+ASYNCHRONOUS JAVASCRIPT - HOW IT WORKS
+========================================================
+
+PROBLEM:
+
+JavaScript alone is not enough to handle asynchronous operations.
+
+Why?
+- JavaScript is single-threaded
+- It cannot perform background tasks on its own
+
+--------------------------------------------------------
+HOW ASYNC IS POSSIBLE
+--------------------------------------------------------
+
+JavaScript relies on external environments:
+
+✔ Web Browsers (Chrome, Firefox, etc.)
+✔ Node.js runtime
+
+These environments provide:
+- Web APIs / Node APIs
+- Timer functions
+- Network handling
+- Event listeners
+
+--------------------------------------------------------
+WEB APIs / NODE APIs
+--------------------------------------------------------
+
+These APIs help execute tasks outside the main thread.
+
+Examples:
+
+1. Timers
+   - setTimeout()
+   - setInterval()
+
+2. User interactions
+   - addEventListener()
+
+3. Network calls
+   - fetch()
+   - HTTP requests
+
+--------------------------------------------------------
+EXAMPLE
+--------------------------------------------------------
+
+console.log("Start");
+
+setTimeout(() => {
+  console.log("Timer done");
+}, 2000);
+
+console.log("End");
+
+Output:
+Start
+End
+Timer done
+
+Explanation:
+- setTimeout is handled by Web API
+- It runs outside main thread
+- Callback executes later
+
+--------------------------------------------------------
+EVENT-BASED EXECUTION
+--------------------------------------------------------
+
+Async tasks are triggered by events:
+
+- Timer completion
+- User click
+- API response
+
+Example:
+
+button.addEventListener("click", () => {
+  console.log("Button clicked");
+});
+
+--------------------------------------------------------
+NON-BLOCKING BEHAVIOR
+--------------------------------------------------------
+
+JavaScript can:
+
+✔ Start multiple operations
+✔ Continue execution
+✔ Handle results later
+
+Example:
+
+setTimeout(() => console.log("Task 1"), 1000);
+setTimeout(() => console.log("Task 2"), 500);
+
+console.log("Main thread running");
+
+Output:
+Main thread running
+Task 2
+Task 1
+
+--------------------------------------------------------
+ASYNC TOOLS
+--------------------------------------------------------
+
+1. Callbacks
+2. Promises
+3. Async/Await
+
+--------------------------------------------------------
+KEY IDEA
+--------------------------------------------------------
+
+JavaScript does NOT run async code itself.
+
+Instead:
+- It delegates work to Web APIs / Node APIs
+- Gets results later via Event Loop
+
+--------------------------------------------------------
+INTERVIEW ONE-LINER
+--------------------------------------------------------
+
+"Asynchronous JavaScript works by delegating tasks to Web APIs or Node APIs,
+which execute them outside the main thread and return results later via the event loop,
+allowing non-blocking execution."

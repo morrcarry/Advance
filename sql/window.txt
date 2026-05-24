@@ -1,0 +1,206 @@
+PROBLEM: Demonstrate All Major Window Functions on Products Table
+
+Table:
+Products(ProductID, ProductName, CategoryID, Price)
+
+Goal:
+Understand how different window functions behave (ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD)
+
+---
+
+FULL QUERY:
+
+SELECT
+ProductID,
+ProductName,
+CategoryID,
+Price,
+
+ROW_NUMBER() OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS row_num,
+
+RANK() OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS rank_val,
+
+DENSE_RANK() OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS dense_rank_val,
+
+NTILE(3) OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS bucket,
+
+LAG(Price) OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS prev_price,
+
+LEAD(Price) OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS next_price
+
+FROM Products;
+
+---
+
+EXPLANATION OF EACH FUNCTION:
+
+1. ROW_NUMBER()
+
+* Assigns a unique number to each row within a partition
+* Always sequential (1, 2, 3, ...)
+* No duplicates
+
+Example:
+Price: 50, 40, 40, 30
+ROW_NUMBER: 1, 2, 3, 4
+
+---
+
+2. RANK()
+
+* Same values → same rank
+* Skips numbers after duplicates
+
+Example:
+Price: 50, 40, 40, 30
+RANK:  1,  2,  2,  4  (3 is skipped)
+
+---
+
+3. DENSE_RANK()
+
+* Same values → same rank
+* NO gaps in ranking
+
+Example:
+Price: 50, 40, 40, 30
+DENSE_RANK: 1, 2, 2, 3
+
+---
+
+4. NTILE(n)
+
+* Divides rows into n equal groups (buckets)
+
+Example with NTILE(3):
+Top rows → bucket 1
+Middle → bucket 2
+Bottom → bucket 3
+
+Used for:
+
+* Percentile grouping
+* Segmentation
+
+---
+
+5. LAG(column)
+
+* Returns previous row value within partition
+
+Example:
+Price: 50, 40, 30
+LAG:   NULL, 50, 40
+
+Used for:
+
+* Comparing previous values
+* Trend analysis
+
+---
+
+6. LEAD(column)
+
+* Returns next row value within partition
+
+Example:
+Price: 50, 40, 30
+LEAD:  40, 30, NULL
+
+---
+
+IMPORTANT CONCEPTS:
+
+1. PARTITION BY
+
+* Splits data into groups (like GROUP BY but keeps rows)
+
+2. ORDER BY (inside OVER)
+
+* Defines order of calculation
+
+3. OVER()
+
+* Converts function into window function
+
+---
+
+SAMPLE OUTPUT (Conceptual):
+
+## Product | Price | ROW | RANK | DENSE | NTILE | LAG | LEAD
+
+A       | 50    | 1   | 1    | 1     | 1     | NULL| 40
+B       | 40    | 2   | 2    | 2     | 1     | 50  | 40
+C       | 40    | 3   | 2    | 2     | 2     | 40  | 30
+D       | 30    | 4   | 4    | 3     | 3     | 40  | NULL
+
+---
+
+INTERVIEW COMPARISON:
+
+ROW_NUMBER:
+
+* Unique ranking
+* Used for picking 1 row
+
+RANK:
+
+* Handles ties
+* Leaves gaps
+
+DENSE_RANK:
+
+* Handles ties
+* No gaps
+* Preferred for salary problems
+
+---
+
+REAL-WORLD USAGE:
+
+ROW_NUMBER → Pagination, Top N
+RANK → Competition ranking
+DENSE_RANK → Salary ranking
+LAG/LEAD → Analytics, trends
+NTILE → Segmentation
+
+---
+
+BONUS: GET TOP PRODUCT PER CATEGORY
+
+SELECT *
+FROM (
+SELECT *,
+ROW_NUMBER() OVER (
+PARTITION BY CategoryID
+ORDER BY Price DESC
+) AS rn
+FROM Products
+) t
+WHERE rn = 1;
+
+---
+
+FINAL INTERVIEW ANSWER:
+
+"Window functions allow calculations across a set of rows while preserving each row. Functions like ROW_NUMBER, RANK, and DENSE_RANK are used for ranking, while LAG and LEAD are used for accessing adjacent rows."
+
+---

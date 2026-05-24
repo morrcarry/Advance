@@ -1,0 +1,236 @@
+SQL UNION & UNION ALL — COMPLETE INTERVIEW DOC (3+ YRS LEVEL)
+
+---
+
+## MOCK TABLES
+
+Table: employees_current
+id | name   | department | salary
+---------------------------------
+
+1  | Amit   | IT         | 50000
+2  | Neha   | HR         | 40000
+3  | Raj    | IT         | 60000
+4  | Sneha  | Sales      | 45000
+
+---
+
+Table: employees_archive
+id | name   | department | salary
+---------------------------------
+
+5  | Raj    | IT         | 55000
+6  | Karan  | HR         | 42000
+7  | Meena  | Sales      | 47000
+8  | Amit   | IT         | 50000
+
+---
+
+## BASIC UNDERSTANDING
+
+UNION:
+
+* Combines result sets
+* Removes duplicates
+
+UNION ALL:
+
+* Combines result sets
+* Keeps duplicates
+* Faster
+
+---
+
+## QUESTION 1: Combine all employees (with duplicates)
+
+Query:
+SELECT name FROM employees_current
+UNION ALL
+SELECT name FROM employees_archive;
+
+Output:
+Amit
+Neha
+Raj
+Sneha
+Raj
+Karan
+Meena
+Amit
+
+Explanation:
+
+* All rows included
+* Duplicate names (Raj, Amit) appear twice
+
+---
+
+## QUESTION 2: Combine unique employees
+
+Query:
+SELECT name FROM employees_current
+UNION
+SELECT name FROM employees_archive;
+
+Output:
+Amit
+Neha
+Raj
+Sneha
+Karan
+Meena
+
+Explanation:
+
+* Duplicates removed automatically
+
+---
+
+## QUESTION 3: Combine and sort
+
+Query:
+SELECT name FROM employees_current
+UNION ALL
+SELECT name FROM employees_archive
+ORDER BY name;
+
+Output:
+Amit
+Amit
+Karan
+Meena
+Neha
+Raj
+Raj
+Sneha
+
+Explanation:
+
+* ORDER BY applies AFTER UNION ALL
+
+---
+
+## QUESTION 4: Combine with conditions
+
+Query:
+SELECT name FROM employees_current WHERE department = 'IT'
+UNION ALL
+SELECT name FROM employees_archive WHERE salary > 45000;
+
+Output:
+Amit
+Raj
+Raj
+Meena
+
+Explanation:
+
+* First query → IT employees
+* Second query → salary > 45000
+
+---
+
+## QUESTION 5: Remove duplicates using UNION ALL (advanced)
+
+Query:
+SELECT DISTINCT name
+FROM (
+SELECT name FROM employees_current
+UNION ALL
+SELECT name FROM employees_archive
+) t;
+
+Output:
+Amit
+Neha
+Raj
+Sneha
+Karan
+Meena
+
+Explanation:
+
+* UNION ALL + DISTINCT manually removes duplicates
+* Sometimes faster than UNION
+
+---
+
+## QUESTION 6: Add static row (real use case)
+
+Query:
+SELECT name FROM employees_current
+UNION ALL
+SELECT 'TOTAL';
+
+Output:
+Amit
+Neha
+Raj
+Sneha
+TOTAL
+
+Explanation:
+
+* Useful in reporting
+
+---
+
+## QUESTION 7: Combine different structures (IMPORTANT)
+
+Query:
+SELECT name, salary FROM employees_current
+UNION ALL
+SELECT name, salary FROM employees_archive;
+
+Explanation:
+
+* Columns must match in number and type
+
+---
+
+## COMMON ERRORS
+
+❌ Different number of columns
+❌ Mismatched data types
+❌ ORDER BY inside individual queries (wrong placement)
+
+---
+
+## PERFORMANCE INSIGHT (VERY IMPORTANT)
+
+UNION:
+
+* Removes duplicates
+* Uses sorting → slower
+
+UNION ALL:
+
+* No duplicate removal
+* Faster → preferred in real systems
+
+---
+
+## REAL INTERVIEW QUESTIONS
+
+1. Difference between UNION and UNION ALL
+2. Which is faster and why?
+3. When should you avoid UNION?
+4. Can ORDER BY be used inside both queries?
+5. UNION vs JOIN difference
+
+---
+
+## BEST PRACTICE (3+ YEARS LEVEL)
+
+* Use UNION ALL by default
+* Use UNION only when deduplication required
+* Use DISTINCT + UNION ALL for better control
+* Always ensure column alignment
+
+---
+
+## FINAL INTERVIEW ANSWER
+
+"UNION removes duplicates and is slower due to sorting, while UNION ALL retains duplicates and is faster. In production systems, UNION ALL is preferred unless deduplication is required."
+
+---

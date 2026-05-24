@@ -1,0 +1,252 @@
+SQL JOINS — COMPLETE INTERVIEW DOC (BOTH SIDES EXPLAINED)
+
+---
+
+## CORE IDEA (VERY IMPORTANT)
+
+👉 LEFT JOIN:
+
+* Keeps ALL rows from LEFT table
+* Adds matching rows from RIGHT table
+* If no match → NULL
+
+👉 RIGHT JOIN:
+
+* Keeps ALL rows from RIGHT table
+* Adds matching rows from LEFT table
+* If no match → NULL
+
+👉 INNER JOIN:
+
+* Keeps ONLY matching rows (both sides must match)
+
+👉 FULL JOIN:
+
+* Keeps ALL rows from BOTH tables
+
+---
+
+## SAMPLE TABLES
+
+Table: employees
+id | name  | dept_id
+--------------------
+
+1  | Amit  | 1
+2  | Neha  | 2
+3  | Raj   | 3
+4  | Sneha | 2
+5  | Karan | NULL
+
+---
+
+Table: departments
+id | dept_name
+--------------
+
+1  | IT
+2  | HR
+4  | Sales
+
+---
+
+1. INNER JOIN — MATCHING ONLY (ORDER DOES NOT MATTER)
+
+---
+
+Query 1:
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d
+ON e.dept_id = d.id;
+
+Query 2:
+SELECT e.name, d.dept_name
+FROM departments d
+INNER JOIN employees e
+ON e.dept_id = d.id;
+
+Output (same for both):
+Amit  | IT
+Neha  | HR
+Sneha | HR
+
+Explanation:
+
+* Only matching rows
+* Table order DOES NOT matter
+
+---
+
+2. LEFT JOIN — EMPLOYEES AS LEFT
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM employees e
+LEFT JOIN departments d
+ON e.dept_id = d.id;
+
+Output:
+Amit  | IT
+Neha  | HR
+Raj   | NULL
+Sneha | HR
+Karan | NULL
+
+Explanation:
+
+* LEFT = employees
+* Keeps ALL employees
+* Missing department → NULL
+
+---
+
+3. LEFT JOIN — DEPARTMENTS AS LEFT (IMPORTANT)
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM departments d
+LEFT JOIN employees e
+ON e.dept_id = d.id;
+
+Output:
+Amit   | IT
+Neha   | HR
+Sneha  | HR
+NULL   | Sales
+
+Explanation:
+
+* LEFT = departments
+* Keeps ALL departments
+* Sales has no employees → NULL
+
+---
+
+4. RIGHT JOIN — EMPLOYEES AS RIGHT
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM departments d
+RIGHT JOIN employees e
+ON e.dept_id = d.id;
+
+Output:
+Amit  | IT
+Neha  | HR
+Raj   | NULL
+Sneha | HR
+Karan | NULL
+
+Explanation:
+
+* RIGHT = employees
+* Keeps ALL employees
+
+---
+
+5. RIGHT JOIN — DEPARTMENTS AS RIGHT
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM employees e
+RIGHT JOIN departments d
+ON e.dept_id = d.id;
+
+Output:
+Amit  | IT
+Neha  | HR
+Sneha | HR
+NULL  | Sales
+
+Explanation:
+
+* RIGHT = departments
+* Keeps ALL departments
+
+---
+
+6. FULL OUTER JOIN (SYMMETRIC)
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM employees e
+FULL OUTER JOIN departments d
+ON e.dept_id = d.id;
+
+Output:
+Amit  | IT
+Neha  | HR
+Sneha | HR
+Raj   | NULL
+Karan | NULL
+NULL  | Sales
+
+Explanation:
+
+* Keeps ALL rows from BOTH tables
+* Order does NOT matter
+
+---
+
+7. CROSS JOIN (NO LEFT/RIGHT CONCEPT)
+
+---
+
+Query:
+SELECT e.name, d.dept_name
+FROM employees e
+CROSS JOIN departments d;
+
+Output (partial):
+Amit  | IT
+Amit  | HR
+Amit  | Sales
+...
+
+Explanation:
+
+* Every row × every row
+* No condition
+
+---
+
+## KEY DIFFERENCE TABLE
+
+| Join Type | Order Matters | Keeps Left | Keeps Right |
+| --------- | ------------- | ---------- | ----------- |
+| INNER     | ❌ No          | ❌ No       | ❌ No        |
+| LEFT      | ✅ Yes         | ✅ Yes      | ❌ No        |
+| RIGHT     | ✅ Yes         | ❌ No       | ✅ Yes       |
+| FULL      | ❌ No          | ✅ Yes      | ✅ Yes       |
+
+---
+
+## IMPORTANT INTERVIEW INSIGHT
+
+👉 LEFT JOIN ≠ RIGHT JOIN
+👉 They are mirror operations
+
+👉 This is always true:
+
+# employees LEFT JOIN departments
+
+departments RIGHT JOIN employees
+
+---
+
+## FINAL INTERVIEW ANSWER
+
+"For INNER JOIN, table order does not matter. For LEFT and RIGHT JOIN, the order defines which table’s rows are preserved. LEFT JOIN keeps all rows from the first table, while RIGHT JOIN keeps all rows from the second table."
+
+---

@@ -1,0 +1,312 @@
+========================================================
+PROMISES - COMPLETE GUIDE (4+ YEARS EXPERIENCE)
+========================================================
+
+--------------------------------------------------------
+1. CORE DEFINITION (INTERVIEW LEVEL)
+--------------------------------------------------------
+
+A Promise is an object representing the eventual completion
+or failure of an asynchronous operation.
+
+It acts as a wrapper around a future value.
+
+--------------------------------------------------------
+2. PROMISE CREATION (INTERNAL UNDERSTANDING)
+--------------------------------------------------------
+
+const promise = new Promise((resolve, reject) => {
+    // executor function runs immediately
+});
+
+IMPORTANT:
+
+✔ Executor runs SYNCHRONOUSLY
+✔ resolve/reject settle the promise ONCE
+✔ State is immutable after settlement
+
+--------------------------------------------------------
+3. PROMISE STATES (STRICT)
+--------------------------------------------------------
+
+1. pending
+2. fulfilled (resolve called)
+3. rejected (reject called)
+
+RULE:
+
+👉 Once settled → state cannot change
+
+--------------------------------------------------------
+4. HOW RESOLVE / REJECT WORK
+--------------------------------------------------------
+
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve("Data received");
+    }, 1000);
+});
+
+--------------------------------------------------------
+KEY POINT:
+
+resolve() DOES NOT execute .then immediately
+
+👉 It queues a microtask
+
+--------------------------------------------------------
+5. CONSUMING PROMISE
+--------------------------------------------------------
+
+promise
+  .then(result => {
+      console.log(result);
+  })
+  .catch(error => {
+      console.error(error);
+  });
+
+--------------------------------------------------------
+IMPORTANT:
+
+✔ .then → handles fulfilled
+✔ .catch → handles rejected
+✔ .finally → always runs
+
+--------------------------------------------------------
+6. EXECUTION FLOW (VERY IMPORTANT)
+--------------------------------------------------------
+
+1. Promise created → executor runs immediately
+2. Async task starts (timer / API / IO)
+3. resolve() / reject() called
+4. Callback added to MICROTASK QUEUE
+5. Event loop executes microtasks BEFORE macrotasks
+
+--------------------------------------------------------
+7. MICROTASK VS MACROTASK (CRITICAL)
+--------------------------------------------------------
+
+Microtasks:
+✔ Promise.then
+✔ Promise.catch
+✔ Promise.finally
+✔ queueMicrotask
+
+Macrotasks:
+✔ setTimeout
+✔ setInterval
+✔ setImmediate (Node)
+
+RULE:
+
+👉 Microtasks ALWAYS execute before macrotasks
+
+--------------------------------------------------------
+EXAMPLE
+--------------------------------------------------------
+
+console.log("Start");
+
+setTimeout(() => console.log("Timeout"), 0);
+
+Promise.resolve().then(() => console.log("Promise"));
+
+console.log("End");
+
+OUTPUT:
+
+Start
+End
+Promise
+Timeout
+
+--------------------------------------------------------
+8. PROMISE CHAINING (CORE CONCEPT)
+--------------------------------------------------------
+
+function fetchUser() {
+    return Promise.resolve({ id: 1 });
+}
+
+function fetchOrders(user) {
+    return Promise.resolve(["order1"]);
+}
+
+fetchUser()
+  .then(user => fetchOrders(user))
+  .then(orders => console.log(orders))
+  .catch(err => console.error(err));
+
+--------------------------------------------------------
+IMPORTANT RULE:
+
+👉 Always return from .then()
+
+BAD:
+
+.then(user => {
+   fetchOrders(user);
+})
+
+GOOD:
+
+.then(user => {
+   return fetchOrders(user);
+})
+
+--------------------------------------------------------
+9. ERROR PROPAGATION
+--------------------------------------------------------
+
+Errors bubble automatically
+
+fetchUser()
+  .then(() => {
+      throw new Error("Fail");
+  })
+  .catch(err => console.log(err.message));
+
+--------------------------------------------------------
+10. PARALLEL VS SEQUENTIAL EXECUTION
+--------------------------------------------------------
+
+SEQUENTIAL (slow):
+
+await fetchUser();
+await fetchOrders();
+
+PARALLEL (fast):
+
+const [user, orders] = await Promise.all([
+    fetchUser(),
+    fetchOrders()
+]);
+
+--------------------------------------------------------
+11. PROMISE METHODS (ADVANCED)
+--------------------------------------------------------
+
+--------------------------------------------------------
+Promise.all()
+--------------------------------------------------------
+
+✔ Runs in parallel
+✔ Fails fast (any reject → reject)
+
+--------------------------------------------------------
+Promise.allSettled()
+--------------------------------------------------------
+
+✔ Returns all results
+✔ Never fails
+
+--------------------------------------------------------
+Promise.race()
+--------------------------------------------------------
+
+✔ First settled (resolve/reject)
+
+--------------------------------------------------------
+Promise.any()
+--------------------------------------------------------
+
+✔ First fulfilled only
+
+--------------------------------------------------------
+12. REAL-WORLD EXAMPLE (API FLOW)
+--------------------------------------------------------
+
+function fetchUser() {
+    return fetch("/api/user")
+        .then(res => res.json());
+}
+
+function fetchOrders(userId) {
+    return fetch(`/api/orders/${userId}`)
+        .then(res => res.json());
+}
+
+async function process() {
+    try {
+        const user = await fetchUser();
+        const orders = await fetchOrders(user.id);
+        console.log(orders);
+    } catch (err) {
+        console.error("API failed", err);
+    }
+}
+
+--------------------------------------------------------
+13. PROMISE VS CALLBACK (REAL DIFFERENCE)
+--------------------------------------------------------
+
+Callbacks:
+❌ Inversion of control
+❌ Callback hell
+❌ Multiple calls possible
+
+Promises:
+✔ Controlled flow
+✔ Single resolution
+✔ Better error handling
+
+--------------------------------------------------------
+14. COMMON PITFALLS (INTERVIEW FAVORITE)
+--------------------------------------------------------
+
+1. Missing return in .then
+2. Mixing async/await with .then unnecessarily
+3. Not handling rejection
+4. Blocking event loop inside async
+5. Multiple resolve/reject calls (ignored after first)
+
+--------------------------------------------------------
+15. PROMISE INTERNAL GUARANTEES
+--------------------------------------------------------
+
+✔ resolve/reject called once
+✔ Handlers run asynchronously
+✔ Order of .then preserved
+✔ Errors auto propagate
+
+--------------------------------------------------------
+16. .finally()
+--------------------------------------------------------
+
+promise
+  .finally(() => {
+      console.log("Cleanup");
+  });
+
+✔ Runs always
+✔ No access to resolved value
+
+--------------------------------------------------------
+17. BEST PRACTICES (4+ YEARS)
+--------------------------------------------------------
+
+✔ Prefer async/await
+✔ Use Promise.all for parallel work
+✔ Always handle errors
+✔ Avoid deep chains
+✔ Use try/catch over .then for readability
+
+--------------------------------------------------------
+18. INTERVIEW QUESTIONS (REAL)
+--------------------------------------------------------
+
+Q: Why Promise.then runs before setTimeout?
+Q: Difference between Promise.all and allSettled?
+Q: What happens if resolve is called twice?
+Q: How does microtask queue work?
+Q: Can Promise be synchronous?
+Q: Difference between async/await and Promise?
+
+--------------------------------------------------------
+19. INTERVIEW ONE-LINER
+--------------------------------------------------------
+
+"A Promise is an object representing the eventual result of an asynchronous
+operation, executed via the microtask queue, providing a structured and
+predictable alternative to callbacks."

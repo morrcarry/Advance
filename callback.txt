@@ -1,0 +1,277 @@
+========================================================
+CALLBACKS - COMPLETE MASTER DOCUMENT (INTERVIEW LEVEL)
+========================================================
+
+--------------------------------------------------------
+1. WHAT IS A CALLBACK?
+--------------------------------------------------------
+
+A callback is a function passed as an argument to another function
+and executed later.
+
+Example:
+
+function greet(name) {
+  console.log(`Hello ${name}`);
+}
+
+function process(callback) {
+  const name = "Mudit";
+  callback(name);
+}
+
+process(greet);
+
+--------------------------------------------------------
+2. WHY CALLBACKS EXIST
+--------------------------------------------------------
+
+JavaScript is:
+
+✔ Single-threaded
+✔ Synchronous
+✔ Blocking
+
+Problem:
+- Cannot wait for long operations (API, DB, timers)
+
+Solution:
+👉 Use callbacks to execute code AFTER the task completes
+
+--------------------------------------------------------
+3. FIRST-CLASS FUNCTIONS
+--------------------------------------------------------
+
+Functions in JavaScript are first-class:
+
+✔ Can be stored in variables
+✔ Can be passed as arguments
+✔ Can be returned from functions
+
+This enables callbacks.
+
+--------------------------------------------------------
+4. HIGHER ORDER FUNCTIONS
+--------------------------------------------------------
+
+Definition:
+
+A function that:
+✔ Takes a function as argument OR
+✔ Returns a function
+
+Example:
+
+function higherOrder(callback) {
+  callback();
+}
+
+--------------------------------------------------------
+5. TYPES OF CALLBACKS
+--------------------------------------------------------
+
+--------------------------------------------------------
+5.1 SYNCHRONOUS CALLBACKS
+--------------------------------------------------------
+
+Definition:
+Executed immediately.
+
+Example:
+
+[1, 2, 3].map(n => n * 2);
+
+Explanation:
+- Callback runs instantly
+- No delay
+- Blocking
+
+--------------------------------------------------------
+5.2 ASYNCHRONOUS CALLBACKS
+--------------------------------------------------------
+
+Definition:
+Executed AFTER async operation completes.
+
+Example:
+
+setTimeout(() => {
+  console.log("Async callback");
+}, 1000);
+
+--------------------------------------------------------
+WHY ASYNC CALLBACKS?
+--------------------------------------------------------
+
+- Data fetching takes time
+- Cannot block execution
+- Need result later
+
+--------------------------------------------------------
+6. REAL-WORLD CALLBACK USAGE
+--------------------------------------------------------
+
+1. Timers
+
+setTimeout(() => console.log("Done"), 1000);
+
+--------------------------------------------------------
+
+2. Event Handling
+
+button.addEventListener("click", () => {
+  console.log("Clicked");
+});
+
+--------------------------------------------------------
+
+3. API Calls
+
+$.get("url", function(data) {
+  console.log(data);
+});
+
+--------------------------------------------------------
+
+4. Node.js (File System)
+
+fs.readFile("file.txt", (err, data) => {
+  if (err) throw err;
+  console.log(data);
+});
+
+--------------------------------------------------------
+7. ERROR-FIRST CALLBACK (NODE STANDARD)
+--------------------------------------------------------
+
+fs.readFile("file.txt", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log(data);
+});
+
+✔ First argument = error
+✔ Second argument = result
+
+--------------------------------------------------------
+8. CALLBACK EXECUTION FLOW
+--------------------------------------------------------
+
+1. Start async operation
+2. JS continues execution
+3. Operation completes
+4. Callback is pushed to queue
+5. Event loop executes callback
+
+--------------------------------------------------------
+9. PROBLEM WITH CALLBACKS
+--------------------------------------------------------
+
+When multiple async steps depend on each other,
+callbacks become deeply nested.
+
+--------------------------------------------------------
+CALLBACK HELL
+--------------------------------------------------------
+
+Example:
+
+fetchCurrentUser('api/user', function(result) {
+  fetchFollowersByUserId(`api/followers/${result.userId}`, function(result) {
+    fetchFollowerInterests(`api/interests/${result.followerId}`, function(result) {
+      fetchInterestTags(`api/tags/${result.interestId}`, function(result) {
+        fetchTagDescription(`api/description/${result.tagId}`, function(result) {
+          console.log(result);
+        });
+      });
+    });
+  });
+});
+
+--------------------------------------------------------
+PROBLEMS OF CALLBACK HELL
+--------------------------------------------------------
+
+❌ Deep nesting (Pyramid of Doom)
+❌ Hard to read
+❌ Hard to debug
+❌ Hard error handling
+❌ Poor maintainability
+
+--------------------------------------------------------
+10. SUMMARY FOR INTERVIEW
+--------------------------------------------------------
+
+✔ Callbacks are functions passed as arguments
+✔ Can be synchronous or asynchronous
+✔ Used to handle delayed execution
+✔ Foundation of async JavaScript
+✔ Lead to callback hell in complex flows
+
+--------------------------------------------------------
+11. SOLUTIONS TO CALLBACK HELL
+--------------------------------------------------------
+
+--------------------------------------------------------
+11.1 PROMISES
+--------------------------------------------------------
+
+getUser(userId)
+  .then(user => getOrders(user))
+  .then(orders => getPayment(orders))
+  .then(result => console.log(result))
+  .catch(err => console.error(err));
+
+--------------------------------------------------------
+11.2 ASYNC / AWAIT
+--------------------------------------------------------
+
+async function process() {
+  try {
+    const user = await getUser(userId);
+    const orders = await getOrders(user);
+    const result = await getPayment(orders);
+    console.log(result);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+--------------------------------------------------------
+12. WHEN CALLBACKS ARE STILL USED
+--------------------------------------------------------
+
+✔ Node.js core APIs
+✔ Event listeners
+✔ Streams
+✔ Low-level async operations
+
+--------------------------------------------------------
+13. BEST PRACTICES
+--------------------------------------------------------
+
+✔ Avoid deep nesting
+✔ Use promises / async-await
+✔ Always handle errors
+✔ Keep callbacks small
+
+--------------------------------------------------------
+14. COMMON INTERVIEW QUESTIONS
+--------------------------------------------------------
+
+Q: What is a callback?
+Q: Difference between sync & async callback?
+Q: What is callback hell?
+Q: How to avoid callback hell?
+Q: Why promises are better?
+Q: Explain error-first callback in Node.js
+
+--------------------------------------------------------
+15. INTERVIEW ONE-LINER
+--------------------------------------------------------
+
+"A callback is a function passed to another function to be executed later.
+It is the foundation of asynchronous JavaScript but can lead to callback hell,
+which is why Promises and async/await are preferred."

@@ -1,0 +1,217 @@
+========================================================
+TIMEOUTS & INTERVALS - COMPLETE (FINAL NOTES)
+========================================================
+
+DEFINITION:
+
+Timers allow delayed or repeated execution of code using:
+
+1. setTimeout()
+2. setInterval()
+
+NOTE:
+Timers are NOT part of JavaScript itself.
+They are provided by Web APIs (browser) or Node APIs.
+
+--------------------------------------------------------
+1. setTimeout()
+--------------------------------------------------------
+
+DEFINITION:
+
+setTimeout executes a function ONCE after a delay.
+
+SYNTAX:
+
+setTimeout(function, delay, param1, param2, ...)
+
+--------------------------------------------------------
+EXAMPLE
+--------------------------------------------------------
+
+function greet() {
+  console.log("Hello");
+}
+
+setTimeout(greet, 2000);
+
+Output:
+Hello (after 2 seconds)
+
+--------------------------------------------------------
+WITH PARAMETERS
+--------------------------------------------------------
+
+function greet(name) {
+  console.log(`Hello ${name}`);
+}
+
+setTimeout(greet, 2000, "Vishwas");
+
+--------------------------------------------------------
+IMPORTANT POINTS
+--------------------------------------------------------
+
+- setTimeout is asynchronous
+- Delay is MINIMUM delay, NOT guaranteed exact timing
+- Actual execution depends on event loop and call stack
+
+Example:
+
+setTimeout(greet, 0);
+
+👉 Does NOT run immediately
+👉 Runs after current call stack is empty
+
+--------------------------------------------------------
+CLEARING TIMEOUT
+--------------------------------------------------------
+
+const timeoutId = setTimeout(greet, 2000);
+clearTimeout(timeoutId);
+
+👉 Cancels execution
+
+--------------------------------------------------------
+2. setInterval()
+--------------------------------------------------------
+
+DEFINITION:
+
+setInterval executes a function repeatedly at fixed intervals.
+
+--------------------------------------------------------
+EXAMPLE
+--------------------------------------------------------
+
+setInterval(() => {
+  console.log("Hello");
+}, 2000);
+
+👉 Runs every 2 seconds
+
+--------------------------------------------------------
+CLEARING INTERVAL
+--------------------------------------------------------
+
+const intervalId = setInterval(greet, 2000);
+clearInterval(intervalId);
+
+--------------------------------------------------------
+IMPORTANT DIFFERENCE
+--------------------------------------------------------
+
+setTimeout → runs ONCE  
+setInterval → runs REPEATEDLY  
+
+--------------------------------------------------------
+3. IMPORTANT CONCEPTS (VERY IMPORTANT)
+--------------------------------------------------------
+
+1. Timers are NOT part of JS engine
+   - They are handled by Web APIs / Node APIs
+
+2. Delay is MINIMUM delay
+   - Not guaranteed exact timing
+
+Example:
+
+setTimeout(greet, 0);
+
+👉 Still waits until:
+- Call stack is empty
+- Event loop schedules it
+
+--------------------------------------------------------
+4. RECURSIVE setTimeout vs setInterval
+--------------------------------------------------------
+
+Recursive setTimeout:
+
+function run() {
+  console.log("Hello");
+  setTimeout(run, 100);
+}
+
+setTimeout(run, 100);
+
+--------------------------------------------------------
+
+setInterval:
+
+setInterval(() => {
+  console.log("Hello");
+}, 100);
+
+--------------------------------------------------------
+KEY DIFFERENCE
+--------------------------------------------------------
+
+Recursive setTimeout:
+✔ Guarantees delay AFTER execution finishes
+✔ Safer for heavy tasks
+✔ Can adjust delay dynamically
+
+setInterval:
+❌ Does NOT wait for previous execution to finish
+❌ Can cause overlapping execution
+
+--------------------------------------------------------
+5. EXECUTION TIME DIFFERENCE
+--------------------------------------------------------
+
+setInterval:
+
+- Interval includes execution time
+
+Example:
+- Code takes 40ms → interval = 60ms
+- Code takes 50ms → interval = 50ms
+
+👉 Can cause inconsistency
+
+--------------------------------------------------------
+
+Recursive setTimeout:
+
+- Waits AFTER execution
+
+Example:
+- Code runs → THEN delay starts
+
+👉 More predictable timing
+
+--------------------------------------------------------
+6. WHEN TO USE WHAT
+--------------------------------------------------------
+
+Use setTimeout:
+✔ One-time delay
+✔ Controlled execution
+✔ Dynamic timing
+
+Use setInterval:
+✔ Repeated simple tasks
+✔ Polling (with caution)
+
+Better alternative:
+✔ Recursive setTimeout (recommended for control)
+
+--------------------------------------------------------
+KEY TAKEAWAYS
+--------------------------------------------------------
+
+1. Timers are handled outside JS (Web APIs)
+2. Delay is minimum, not exact
+3. setInterval can overlap executions
+4. Recursive setTimeout gives better control
+5. Always clear timers to avoid memory leaks
+
+--------------------------------------------------------
+INTERVIEW ONE-LINER
+--------------------------------------------------------
+
+"setTimeout and setInterval are asynchronous timer functions
+provided by Web APIs. setTimeout executes once after a delay,
+while setInterval repeats execution. Recursive setTimeout is
+often preferred for better control over execution timing."
